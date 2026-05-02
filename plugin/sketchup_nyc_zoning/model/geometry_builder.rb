@@ -30,7 +30,7 @@ module NYCZoning
       # Ensure face normal points up before extrusion
       face.reverse! if face.normal.z < 0
 
-      face.pushpull(-height_in)
+      face.pushpull(height_in)
 
       material = ZoningPalette.material_for(
         props["zoning_district"].to_s, @model

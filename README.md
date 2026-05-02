@@ -14,23 +14,33 @@ Load real NYC zoning 3D models into SketchUp. Three components:
 # 1. Bootstrap (creates venvs, installs deps)
 .\scripts\bootstrap.ps1
 
-# 2. Fetch data for Times Square area
-cd pipeline
-.\.venv\Scripts\activate
-nyczone fetch --bbox -74.001,40.747,-73.997,40.751 --out ..\data\cache\times-square.geojson
+# 2. Install SketchUp plugin
+.\scripts\install-plugin.ps1
 
-# 3. Start MCP server
+# 3. Start MCP server — keep this terminal open the entire session
 .\scripts\run-mcp.ps1
 
-# 4. Install SketchUp plugin
-.\scripts\install-plugin.ps1
+# 4. Open SketchUp 2026 → Extensions → NYC Zoning - Load Model
 ```
+
+> **Important:** `run-mcp.ps1` must stay running while SketchUp is open.
+> Open it in a **dedicated PowerShell window** and leave it running.
+> Every time you restart SketchUp, restart this script first.
+> If you see `Net::ReadTimeout` in the plugin, the server has stopped — rerun this script.
 
 ## Data Sources
 
 - [Building Footprints](https://data.cityofnewyork.us/resource/qrmh-6wdr.json) — NYC Open Data
 - [MapPLUTO](https://data.cityofnewyork.us/resource/64uk-42ks.json) — DCP lot data
 - [Zoning Districts](https://data.cityofnewyork.us/resource/6tn7-vhp3.json) — DCP
+
+## Troubleshooting
+
+| Error | Cause | Fix |
+|-------|-------|-----|
+| `Net::ReadTimeout` in plugin | MCP server not running | Run `.\scripts\run-mcp.ps1` in a dedicated terminal |
+| Buildings appear upside-down | `pushpull` direction bug | Fixed in v1.0.1 — reinstall plugin |
+| `NYC Zoning` missing from Extensions menu | Plugin not installed | Run `.\scripts\install-plugin.ps1`, restart SketchUp |
 
 ## Docs
 
