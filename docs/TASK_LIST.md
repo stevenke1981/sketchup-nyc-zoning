@@ -68,3 +68,38 @@
 - [ ] `scripts/e2e-smoke.ps1` — boot MCP + validate round trip
 - [ ] `scripts/install-plugin.ps1` — copy to SketchUp Plugins folder
 - [ ] All docs finalized
+
+## Phase 6: Taiwan Support
+
+目標：支援台灣縣市建物 3D 模型載入，架構與 NYC pipeline 平行。
+
+### 資料來源
+- [ ] 研究內政部國土測繪中心 WFS API（建物輪廓圖徵資料）
+- [ ] 研究內政部營建署城鄉發展分署都市計畫分區 API
+- [ ] 評估 OpenStreetMap Overpass API 作為建物高度補充來源
+      （台北、新北、台中、高雄覆蓋率較完整）
+
+### Pipeline
+- [ ] `pipeline/src/twzone/` — 台灣 pipeline 套件（與 nyczone 平行）
+- [ ] `pipeline/src/twzone/sources/nlsc.py` — 國土測繪中心 WFS client
+- [ ] `pipeline/src/twzone/sources/overpass.py` — OSM Overpass API client
+- [ ] `pipeline/src/twzone/sources/urban_plan.py` — 都市計畫分區 API client
+- [ ] `pipeline/src/twzone/geo/transform.py` — TWD97 (EPSG:3826) ↔ WGS84 轉換
+- [ ] `pipeline/src/twzone/normalize/buildings.py` — 樓層數 × 3m 估算建物高度
+- [ ] `pipeline/src/twzone/normalize/zoning.py` — 住宅區/商業區/工業區色碼對應
+- [ ] `pipeline/src/twzone/export/geojson.py` — 輸出 local_x_m/local_y_m 格式
+
+### MCP Server
+- [ ] `mcp-server/src/nyczone_mcp/tools/tw_query_buildings.py` — bbox 查詢建物
+- [ ] `mcp-server/src/nyczone_mcp/tools/tw_query_zoning.py` — 都市計畫分區查詢
+- [ ] `mcp-server/src/nyczone_mcp/tools/tw_search_by_address.py` — 地址轉座標
+
+### SketchUp Plugin
+- [ ] `plugin/sketchup_nyc_zoning/geo/tw_city_index.rb` — 縣市 bbox 靜態表
+      （台北市、新北市、台中市、台南市、高雄市、桃園市）
+- [ ] Plugin UI 新增 Taiwan 分頁，支援縣市下拉選單
+
+### 研究事項
+- [ ] 確認國土測繪中心 WFS 開放授權條款
+- [ ] 確認都市計畫分區 API 是否有 bbox 空間查詢支援
+- [ ] 評估 TWD97 本島坐標系 vs WGS84 精度差異對 SketchUp 的影響
