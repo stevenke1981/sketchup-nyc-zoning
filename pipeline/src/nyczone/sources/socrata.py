@@ -1,4 +1,6 @@
 """Async Socrata client with retry, pagination, and bbox filtering."""
+from __future__ import annotations
+
 from collections.abc import AsyncIterator
 from typing import Any
 
