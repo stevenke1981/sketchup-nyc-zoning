@@ -10,8 +10,9 @@ ANCHOR_LAT = 40.749
 
 SAMPLE_FOOTPRINT_ROW = {
     "bin": "1001001",
-    "heightroof": "443.1",
-    "numfloors": "102",
+    "mappluto_bbl": "1001001001",
+    "height_roof": "443.1",
+    "num_floors": "102",
     "the_geom": {
         "type": "Polygon",
         "coordinates": [

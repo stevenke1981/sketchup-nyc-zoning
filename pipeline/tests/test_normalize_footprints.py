@@ -9,13 +9,13 @@ def test_normalize_basic():
     b = normalize_footprint(SAMPLE_FOOTPRINT_ROW, ANCHOR_LON, ANCHOR_LAT)
     assert b is not None
     assert b.height_ft == pytest.approx(443.1)
-    assert b.height_source == "heightroof"
+    assert b.height_source == "height_roof"
     assert len(b.rings) == 1
     assert len(b.rings[0]) == 5
 
 
 def test_normalize_height_fallback():
-    row = {**SAMPLE_FOOTPRINT_ROW, "heightroof": None, "numfloors": "10"}
+    row = {**SAMPLE_FOOTPRINT_ROW, "height_roof": None, "num_floors": "10"}
     b = normalize_footprint(row, ANCHOR_LON, ANCHOR_LAT)
     assert b is not None
     assert b.height_source == "numfloors"

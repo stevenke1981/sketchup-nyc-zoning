@@ -1,4 +1,7 @@
-"""Integration test for pipeline.fetch_buildings using mocked Socrata."""
+"""Integration test for pipeline.fetch_buildings using mocked Socrata.
+
+Pipeline now: footprints (5zhs-2jue) + PLUTO (64uk-42ks lat/lon filter), joined by BBL.
+"""
 from __future__ import annotations
 
 import pytest
@@ -10,8 +13,9 @@ BBOX = BBox(-74.001, 40.747, -73.997, 40.751)
 
 FOOTPRINT_ROW = {
     "bin": "1001001",
-    "heightroof": "443.1",
-    "numfloors": "102",
+    "mappluto_bbl": "1007510076",   # links to PLUTO bbl
+    "height_roof": "443.1",
+    "num_floors": "102",
     "the_geom": {
         "type": "Polygon",
         "coordinates": [
@@ -26,29 +30,21 @@ FOOTPRINT_ROW = {
     },
 }
 
-ZONING_ROW = {
-    "zonedist": "R8A",
-    "label": "R8A",
-    "the_geom": {
-        "type": "Polygon",
-        "coordinates": [
-            [
-                [-74.005, 40.744],
-                [-73.993, 40.744],
-                [-73.993, 40.755],
-                [-74.005, 40.755],
-                [-74.005, 40.744],
-            ]
-        ],
-    },
+PLUTO_ROW = {
+    "bbl": "1007510076.00000000",   # PLUTO BBL has decimal form
+    "zonedist1": "R8A",
+    "numfloors": "4",
+    "yearbuilt": "1920",
+    "address": "100 TEST ST",
+    "landuse": "01",
 }
 
 
 @pytest.mark.asyncio
 async def test_fetch_buildings_basic(httpx_mock: HTTPXMock):
-    # Two requests: footprints + zoning (in parallel)
+    # Two requests in parallel: footprints + PLUTO
     httpx_mock.add_response(json=[FOOTPRINT_ROW])
-    httpx_mock.add_response(json=[ZONING_ROW])
+    httpx_mock.add_response(json=[PLUTO_ROW])
 
     anchor_lon, anchor_lat = BBOX.center
     buildings = await fetch_buildings(BBOX, anchor_lon, anchor_lat)
@@ -63,13 +59,27 @@ async def test_fetch_buildings_basic(httpx_mock: HTTPXMock):
 @pytest.mark.asyncio
 async def test_fetch_buildings_zoning_tagged(httpx_mock: HTTPXMock):
     httpx_mock.add_response(json=[FOOTPRINT_ROW])
-    httpx_mock.add_response(json=[ZONING_ROW])
+    httpx_mock.add_response(json=[PLUTO_ROW])
 
     anchor_lon, anchor_lat = BBOX.center
     buildings = await fetch_buildings(BBOX, anchor_lon, anchor_lat)
 
     assert buildings[0].zoning_district == "R8A"
     assert buildings[0].color_hex == "#F5DEB3"
+    assert buildings[0].address == "100 TEST ST"
+    assert buildings[0].year_built == 1920
+
+
+@pytest.mark.asyncio
+async def test_fetch_buildings_no_pluto_match(httpx_mock: HTTPXMock):
+    """Building with no matching PLUTO row → empty zoning, still returned."""
+    httpx_mock.add_response(json=[FOOTPRINT_ROW])
+    httpx_mock.add_response(json=[])   # empty PLUTO
+
+    anchor_lon, anchor_lat = BBOX.center
+    buildings = await fetch_buildings(BBOX, anchor_lon, anchor_lat)
+    assert len(buildings) == 1
+    assert buildings[0].zoning_district == ""
 
 
 @pytest.mark.asyncio

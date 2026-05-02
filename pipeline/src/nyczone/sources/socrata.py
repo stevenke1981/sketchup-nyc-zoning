@@ -13,9 +13,8 @@ from nyczone.geo.bbox import BBox
 SOCRATA_BASE = "https://data.cityofnewyork.us/resource"
 
 DATASET_IDS = {
-    "footprints": "qrmh-6wdr",
-    "pluto": "64uk-42ks",
-    "zoning": "6tn7-vhp3",
+    "footprints": "5zhs-2jue",   # Building Footprints (DoITT) — has the_geom + height_roof
+    "pluto": "64uk-42ks",        # MapPLUTO — has zonedist1, numfloors, yearbuilt
 }
 
 
@@ -36,18 +35,33 @@ async def _get(client: httpx.AsyncClient, url: str, params: dict[str, Any]) -> l
 async def fetch_dataset(
     dataset: str, bbox: BBox, extra_where: str = ""
 ) -> AsyncIterator[list[dict]]:
-    """Yield pages of records for a dataset within bbox."""
+    """Yield pages of records for a dataset within bbox (uses the_geom column)."""
     dataset_id = DATASET_IDS[dataset]
     url = f"{SOCRATA_BASE}/{dataset_id}.json"
     where = bbox.to_socrata_where()
     if extra_where:
         where = f"{where} AND {extra_where}"
+    async for page in _paginate(url, where):
+        yield page
 
+
+async def fetch_pluto_in_bbox(bbox: BBox) -> AsyncIterator[list[dict]]:
+    """Yield PLUTO pages filtered by lat/lon range (PLUTO has no the_geom polygon)."""
+    url = f"{SOCRATA_BASE}/{DATASET_IDS['pluto']}.json"
+    where = (
+        f"latitude >= {bbox.min_lat} AND latitude <= {bbox.max_lat} "
+        f"AND longitude >= {bbox.min_lon} AND longitude <= {bbox.max_lon}"
+    )
+    async for page in _paginate(url, where):
+        yield page
+
+
+async def _paginate(url: str, where: str) -> AsyncIterator[list[dict]]:
     async with httpx.AsyncClient() as client:
         offset = 0
         fetched = 0
         while True:
-            params = {
+            params: dict[str, Any] = {
                 "$where": where,
                 "$limit": settings.socrata_limit,
                 "$offset": offset,

@@ -55,16 +55,21 @@ def normalize_footprint(
     if not rings or len(rings[0]) < 3:
         return None
 
-    height_ft = float(row.get("heightroof") or 0)
-    numfloors = int(float(row.get("numfloors") or 1))
+    # 5zhs-2jue uses "height_roof"; fallback chain → numfloors → placeholder
+    height_ft = float(row.get("height_roof") or row.get("heightroof") or 0)
+    numfloors = int(float(row.get("num_floors") or row.get("numfloors") or 1))
     if height_ft <= 0:
         height_ft = numfloors * 11.48
         height_source = "numfloors"
     else:
-        height_source = "heightroof"
+        height_source = "height_roof"
+
+    # mappluto_bbl links to PLUTO for later join
+    mappluto_bbl = str(row.get("mappluto_bbl") or row.get("base_bbl") or "")
 
     return Building(
         bin=str(row.get("bin", "")),
+        bbl=mappluto_bbl,
         numfloors=numfloors,
         height_ft=height_ft,
         height_source=height_source,
