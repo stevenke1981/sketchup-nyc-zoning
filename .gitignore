@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+htmlcov/
+.coverage
+
+# Data & cache
+data/cache/*.sqlite
+data/cache/*.geojson
+data/logs/
+
+# Secrets
+.env
+config.json
+!plugin/config/config.example.json
+
+# SketchUp
+*.skb
+*.skp
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# IDEs
+.vscode/
+.idea/
+*.suo
+*.user

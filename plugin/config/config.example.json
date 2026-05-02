@@ -1,0 +1,6 @@
+{
+  "mcp_url": "http://127.0.0.1:8765",
+  "bearer_token": "CHANGE_ME",
+  "chunk_size": 250,
+  "max_features": 10000
+}

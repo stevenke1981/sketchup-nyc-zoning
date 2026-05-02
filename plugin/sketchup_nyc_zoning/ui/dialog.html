@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>NYC Zoning Loader</title>
+<link rel="stylesheet" href="dialog.css">
+</head>
+<body>
+<div class="app">
+  <h2>NYC Zoning</h2>
+
+  <!-- Mode tabs -->
+  <div class="tabs">
+    <button class="tab active" data-mode="borough">Borough</button>
+    <button class="tab" data-mode="zip">ZIP Code</button>
+    <button class="tab" data-mode="bbox">Bounding Box</button>
+  </div>
+
+  <!-- Borough panel -->
+  <div id="panel-borough" class="panel">
+    <label>Borough
+      <select id="borough-select">
+        <option value="manhattan">Manhattan</option>
+        <option value="brooklyn">Brooklyn</option>
+        <option value="queens">Queens</option>
+        <option value="bronx">Bronx</option>
+        <option value="statenisland">Staten Island</option>
+      </select>
+    </label>
+  </div>
+
+  <!-- ZIP panel -->
+  <div id="panel-zip" class="panel hidden">
+    <label>ZIP Code <input id="zip-input" type="text" placeholder="10001" maxlength="5"></label>
+  </div>
+
+  <!-- BBox panel -->
+  <div id="panel-bbox" class="panel hidden">
+    <label>Min Lon <input id="min-lon" type="number" step="any" placeholder="-74.001"></label>
+    <label>Min Lat <input id="min-lat" type="number" step="any" placeholder="40.747"></label>
+    <label>Max Lon <input id="max-lon" type="number" step="any" placeholder="-73.997"></label>
+    <label>Max Lat <input id="max-lat" type="number" step="any" placeholder="40.751"></label>
+  </div>
+
+  <div class="actions">
+    <button id="btn-load" class="primary">Load</button>
+    <button id="btn-cancel" disabled>Cancel</button>
+  </div>
+
+  <div class="progress-bar"><div id="progress-fill" style="width:0%"></div></div>
+  <div id="status"></div>
+</div>
+<script src="dialog.js"></script>
+</body>
+</html>
